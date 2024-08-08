@@ -24,6 +24,12 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/{id}")
+    public Product fetchProductById(@PathVariable("id") String id) {
+        return productService.getProductById(id);
+    }
+
+
     @PostMapping(value = "/create",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)

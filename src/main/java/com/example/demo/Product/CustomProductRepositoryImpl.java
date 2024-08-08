@@ -22,16 +22,4 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
         System.out.println(mongoTemplate.find(query, Product.class).size());
         return mongoTemplate.find(query, Product.class);
     }
-
-//    public Boolean createProduct(Product product) {
-//        try {
-//            mongoTemplate.insert(product, "product");
-//            System.out.println("Product" + product.getName() +" created successfully");
-//        } catch (Exception exception) {
-//            System.out.println("Error: " + exception.getMessage());
-//            return false;
-//        }
-//        return true;
-//    }
-
 }
