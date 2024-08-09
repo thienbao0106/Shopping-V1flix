@@ -25,18 +25,26 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product fetchProductById(@PathVariable("id") String id) {
+    public Product fetchProductById(@PathVariable("id") String id) throws ServerException {
+        if (id == null || id.isEmpty()) throw new ServerException("Product can't be emptied");
         return productService.getProductById(id);
     }
-
 
     @PostMapping(value = "/create",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@RequestBody Product product) throws ServerException {
+        if (product == null) throw new ServerException("Product can't be emptied");
+        return productService.createProduct(product);
+
+    }
+
+    @PutMapping(value = "/{id}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public Product editProduct(@PathVariable(value = "id") String id, @RequestBody Product product) {
         try {
-            if(product == null) throw new ServerException("Product can't be emptied");
-            return productService.createProduct(product);
+            if (product == null) throw new ServerException("Product can't be emptied");
+            return productService.editProduct(product, id);
         } catch (ServerException e) {
             throw new RuntimeException(e);
         }

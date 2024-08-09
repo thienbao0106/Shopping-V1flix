@@ -15,7 +15,9 @@ import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class ProductService {
+
     private final ProductRepository productRepository;
+
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -36,5 +38,12 @@ public class ProductService {
         Optional<Product> product = productRepository.findById(id);
         return product.map(ResponseEntity::ok)
                 .orElseThrow(() -> new RecordNotFound(HttpStatus.NOT_FOUND, "Not Found Product", "Can't find the product by this id: " + id)).getBody();
+    }
+
+    public Product editProduct(Product editedProduct, String id) {
+
+        if (productRepository.findById(id).isEmpty())
+            throw new RecordNotFound(HttpStatus.NOT_FOUND, "Not Found Product", "Can't find the product by this id: " + id);
+        return productRepository.editCurrentObject(id, productRepository.convertItemToMap(editedProduct), Product.class);
     }
 }
