@@ -1,15 +1,14 @@
 package com.example.demo.Product;
 import com.example.demo.Image;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Data
 @Document
@@ -17,9 +16,13 @@ public class Product {
     @Id
     private String id;
     @Indexed(unique = true)
+    @NotEmpty
     private String name;
+    @NotEmpty
     private Double price;
+    @NotEmpty
     private String description;
+    @NotEmpty
     private Integer quantity;
     private List<Image> images;
     private LocalDateTime created;

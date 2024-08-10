@@ -37,13 +37,22 @@ public class ProductService {
     public Product getProductById(String id) {
         Optional<Product> product = productRepository.findById(id);
         return product.map(ResponseEntity::ok)
-                .orElseThrow(() -> new RecordNotFound(HttpStatus.NOT_FOUND, "Not Found Product", "Can't find the product by this id: " + id)).getBody();
+                .orElseThrow(() -> new RecordNotFound(HttpStatus.NOT_FOUND, "Can't find the product of id: " + id)).getBody();
     }
 
     public Product editProduct(Product editedProduct, String id) {
-
         if (productRepository.findById(id).isEmpty())
-            throw new RecordNotFound(HttpStatus.NOT_FOUND, "Not Found Product", "Can't find the product by this id: " + id);
+            throw new RecordNotFound(HttpStatus.NOT_FOUND, "Can't find the product with id: " + id);
         return productRepository.editCurrentObject(id, productRepository.convertItemToMap(editedProduct), Product.class);
+    }
+
+    public boolean deleteProduct(String id) {
+        try {
+            productRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 }

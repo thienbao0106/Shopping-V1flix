@@ -17,8 +17,6 @@ public class QueryRepositoryImpl<T> implements QueryRepository<T> {
     }
 
     public T editCurrentObject(String id, Map<String, T> editedObject, Class<T> type) {
-        System.out.println("Editted Item: ");
-        System.out.println(editedObject);
         Query query = new Query(Criteria.where("id").is(id));
         // Create an Update object
         Update update = new Update();

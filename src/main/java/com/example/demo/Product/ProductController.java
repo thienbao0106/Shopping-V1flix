@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.rmi.ServerException;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/products")
 @AllArgsConstructor
+    @ControllerAdvice
 public class ProductController {
     @Autowired
     private final ProductService productService;
@@ -45,8 +47,16 @@ public class ProductController {
         try {
             if (product == null) throw new ServerException("Product can't be emptied");
             return productService.editProduct(product, id);
+
         } catch (ServerException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @DeleteMapping(value = "/{id}/delete")
+    public boolean deleteProduct(@PathVariable(value = "id") String id) throws ServerException {
+        boolean isDeleted = productService.deleteProduct(id);
+        if(!isDeleted) throw new ServerException("Product can't be emptied");
+        return true;
     }
 }
