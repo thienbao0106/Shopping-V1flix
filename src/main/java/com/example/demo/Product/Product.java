@@ -1,5 +1,8 @@
 package com.example.demo.Product;
+
 import com.example.demo.Image;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -15,16 +18,21 @@ import java.util.List;
 public class Product {
     @Id
     private String id;
+
     @Indexed(unique = true)
-    @NotEmpty
+    @NotBlank
     private String name;
-    @NotEmpty
+
+    @Min(value = 0, message = "Price can't lower than 0")
     private Double price;
-    @NotEmpty
+
     private String description;
-    @NotEmpty
+
+    @Min(value = 0,  message = "Quantity can't lower than 0")
     private Integer quantity;
+
     private List<Image> images;
+
     private LocalDateTime created;
 
     public Product(String name, Double price, String description, Integer quantity, List<Image> images, LocalDateTime created) {
