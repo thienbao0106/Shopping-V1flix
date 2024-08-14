@@ -1,7 +1,8 @@
 package com.example.demo.Product;
 
 import com.example.demo.Enum.ResponseType;
-import com.example.demo.ResponseHeader;
+import com.example.demo.Base.ResponseHeader;
+import com.example.demo.Genre.Genre;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/products")
+@RequestMapping("/products")
 @AllArgsConstructor
 @ControllerAdvice
 public class ProductController {
@@ -28,7 +28,7 @@ public class ProductController {
     ) {
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "FETCH_LIST_SUCCESSFULLY",
+                "FETCH_SUCCESSFULLY",
                 "Find list successfully",
                 null,
                 ResponseType.SUCCESS.toString()
@@ -44,7 +44,7 @@ public class ProductController {
         if (id == null || id.isEmpty()) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "FETCH_LIST_SUCCESSFULLY",
+                "FETCH_SUCCESSFULLY",
                 "Find product with id " + id + " successfully",
                 productService.getProductById(id),
                 ResponseType.SUCCESS.toString()
@@ -55,14 +55,15 @@ public class ProductController {
     @PostMapping(value = "/create",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<?> addProduct(@RequestBody @Valid Product product) throws ServerException {
-        if (product == null) throw new ServerException("Product can't be emptied");
-        Product newProduct = productService.createProduct(product);
+    public ResponseEntity<?> addProduct(@RequestBody @Valid ProductInput productInput) throws ServerException {
+        if (productInput == null) throw new ServerException("Product can't be emptied");
+//        String genreId = productInput.getGenreId();
+        Product newProduct = productService.createProduct(productInput);
 
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 "CREATE_SUCCESSFULLY",
-                "Create product" + product.getName() + " successfully",
+                "Create product" + newProduct.getName() + " successfully",
                 newProduct,
                 ResponseType.SUCCESS.toString()
         );
@@ -71,16 +72,16 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @RequestBody @Valid Product product) {
+    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @RequestBody ProductInput productInput) throws ServerException {
+        if (productInput == null) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 "EDIT_SUCCESSFULLY",
-                "Edit product with it" + id + " successfully",
-                productService.editProduct(product, id),
+                "Edit product with id " + id + " successfully",
+                productService.editProduct(productInput, id),
                 ResponseType.SUCCESS.toString()
         );
-        return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
+        return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.CREATED);
 
     }
 
@@ -90,7 +91,7 @@ public class ProductController {
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 "DELETE_SUCCESSFULLY",
-                "Delete product with it" + id + " successfully",
+                "Delete product with id " + id + " successfully",
                 null,
                 ResponseType.SUCCESS.toString()
         );

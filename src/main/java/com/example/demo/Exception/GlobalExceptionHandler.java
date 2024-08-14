@@ -1,6 +1,7 @@
-package com.example.demo;
+package com.example.demo.Exception;
 
 import com.example.demo.Enum.ResponseType;
+import com.example.demo.Base.ResponseHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

@@ -1,47 +1,35 @@
 package com.example.demo.Product;
 
-import com.example.demo.Image;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import com.example.demo.Genre.BaseGenre;
+import com.example.demo.Genre.Genre;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 
+@Setter
+@Getter
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Document
-public class Product {
-    @Id
-    private String id;
+public class Product extends BaseProduct {
 
-    @Indexed(unique = true)
-    @NotBlank
-    private String name;
 
-    @Min(value = 0, message = "Price can't lower than 0")
-    private Double price;
 
-    private String description;
+    private BaseGenre genre;
 
-    @Min(value = 0,  message = "Quantity can't lower than 0")
-    private Integer quantity;
+    public Product() {
+        super();
+    }
 
-    private List<Image> images;
-
-    private LocalDateTime created;
-
-    public Product(String name, Double price, String description, Integer quantity, List<Image> images, LocalDateTime created) {
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.quantity = quantity;
-        this.images = images;
-        this.created = created;
+    public void convertInputToProduct(ProductInput productInput) {
+        this.setName(productInput.getName());
+        this.setImages(productInput.getImages());
+        this.setCreated(productInput.getCreated());
+        this.setName(productInput.getName());
+        this.setQuantity(productInput.getQuantity());
+        this.setDescription(productInput.getDescription());
+        this.setName(productInput.getName());
     }
 
 }

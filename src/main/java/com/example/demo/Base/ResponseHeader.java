@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.Base;
 
 import com.example.demo.Enum.ResponseType;
 import lombok.Setter;
@@ -29,8 +29,8 @@ public class ResponseHeader {
         responseMap.put("responseCode", this.responseCode);
         responseMap.put("message", this.message);
         responseMap.put("timestamp", this.timestamp);
-        if (this.responseCode != null && this.responseType.equals(ResponseType.SUCCESS.toString())) responseMap.put("data", this.responseData);
-        if (this.responseCode != null && this.responseType.equals(ResponseType.ERROR.toString())) responseMap.put("errors", this.responseData);
+        if (this.responseData != null && this.responseType.equals(ResponseType.SUCCESS.toString())) responseMap.put("data", this.responseData);
+        if (this.responseData != null && this.responseType.equals(ResponseType.ERROR.toString())) responseMap.put("errors", this.responseData);
         return responseMap;
     }
 
