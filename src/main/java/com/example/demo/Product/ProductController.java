@@ -2,7 +2,7 @@ package com.example.demo.Product;
 
 import com.example.demo.Enum.ResponseType;
 import com.example.demo.Base.ResponseHeader;
-import com.example.demo.Genre.Genre;
+import com.example.demo.Enum.SuccessType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ProductController {
     ) {
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "FETCH_SUCCESSFULLY",
+                SuccessType.FETCH_SUCCESSFULLY.toString(),
                 "Find list successfully",
                 null,
                 ResponseType.SUCCESS.toString()
@@ -44,7 +44,7 @@ public class ProductController {
         if (id == null || id.isEmpty()) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "FETCH_SUCCESSFULLY",
+                SuccessType.FETCH_SUCCESSFULLY.toString(),
                 "Find product with id " + id + " successfully",
                 productService.getProductById(id),
                 ResponseType.SUCCESS.toString()
@@ -62,7 +62,7 @@ public class ProductController {
 
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "CREATE_SUCCESSFULLY",
+                SuccessType.CREATE_SUCCESSFULLY.toString(),
                 "Create product" + newProduct.getName() + " successfully",
                 newProduct,
                 ResponseType.SUCCESS.toString()
@@ -76,7 +76,7 @@ public class ProductController {
         if (productInput == null) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "EDIT_SUCCESSFULLY",
+                SuccessType.EDIT_SUCCESSFULLY.toString(),
                 "Edit product with id " + id + " successfully",
                 productService.editProduct(productInput, id),
                 ResponseType.SUCCESS.toString()
@@ -90,7 +90,7 @@ public class ProductController {
         productService.deleteProduct(id);
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
-                "DELETE_SUCCESSFULLY",
+                SuccessType.DELETE_SUCCESSFULLY.toString(),
                 "Delete product with id " + id + " successfully",
                 null,
                 ResponseType.SUCCESS.toString()

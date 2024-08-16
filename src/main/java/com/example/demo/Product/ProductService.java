@@ -4,6 +4,7 @@ import com.example.demo.Genre.BaseGenre;
 import com.example.demo.Genre.Genre;
 import com.example.demo.Genre.GenreRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,22 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final GenreRepository genreRepository;
 
+    private void setGenreToProduct(String genreId, Product product) {
+        if (genreId == null || genreId.isEmpty()) return;
+        Optional<Genre> genre = genreRepository.findById(genreId);
+        genre.ifPresentOrElse((result) -> {
+            BaseGenre baseGenre = result.covertToBaseGenre();
+            product.setGenre(baseGenre);
+        }, () -> {
+            try {
+                throw new ServerException("Can't find the genre of id: " + genreId);
+            } catch (ServerException ignored) {
+
+            }
+        });
+
+    }
+
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
@@ -35,25 +52,14 @@ public class ProductService {
         }
         Product product = new Product();
         product.convertInputToProduct(productInput);
-
-
-        if (productInput.getGenreId() != null && !productInput.getGenreId().isBlank()) {
-            String genreId = productInput.getGenreId();
-            Optional<Genre> genre = genreRepository.findById(genreId);
-            genre.ifPresentOrElse((result) -> {
-                BaseGenre baseGenre = result.covertToBaseGenre();
-                product.setGenre(baseGenre);
-            }, () -> {
-                try {
-                    throw new ServerException("Can't find the genre of id: " + genreId);
-                } catch (ServerException ignored) {
-
-                }
-            });
-        }
+        String genreId = productInput.getGenreId();
+        setGenreToProduct(genreId, product);
 
         product.setCreated(LocalDateTime.now());
-        return productRepository.save(product);
+
+        Product newProduct = productRepository.save(product);
+        if (productInput.getGenreId() != null) genreRepository.insertProduct(newProduct.getGenre().getId(), newProduct);
+        return newProduct;
     }
 
     public Product getProductById(String id) throws ServerException {
@@ -68,20 +74,8 @@ public class ProductService {
         Product product = new Product();
         product.convertInputToProduct(editedProductInput);
         String genreId = editedProductInput.getGenreId();
+        setGenreToProduct(genreId, product);
 
-        if (genreId != null) {
-            Optional<Genre> genre = genreRepository.findById(genreId);
-            genre.ifPresentOrElse((result) -> {
-                BaseGenre baseGenre = result.covertToBaseGenre();
-                product.setGenre(baseGenre);
-            }, () -> {
-                try {
-                    throw new ServerException("Can't find the genre of id: " + genreId);
-                } catch (ServerException ignored) {
-
-                }
-            });
-        }
         Product resultProduct = productRepository.editCurrentObject(id, productRepository.convertItemToMap(product), Product.class);
         if (genreId != null) genreRepository.insertProduct(genreId, resultProduct);
         return resultProduct;
