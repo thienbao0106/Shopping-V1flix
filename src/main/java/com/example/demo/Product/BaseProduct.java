@@ -30,7 +30,7 @@ public class BaseProduct {
     @Min(value = 0, message = "Quantity can't lower than 0")
     private Integer quantity;
 
-    private List<Image> images;
+
 
     private LocalDateTime created;
 }

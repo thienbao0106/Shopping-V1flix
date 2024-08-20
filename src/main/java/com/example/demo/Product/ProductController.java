@@ -71,8 +71,8 @@ public class ProductController {
 
     }
 
-    @PutMapping(value = "/{id}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @RequestBody ProductInput productInput) throws ServerException {
+    @PutMapping(value = "/{id}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @ModelAttribute ProductInput productInput) throws ServerException {
         if (productInput == null) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),

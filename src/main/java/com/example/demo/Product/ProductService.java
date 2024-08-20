@@ -1,18 +1,22 @@
 package com.example.demo.Product;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.example.demo.CustomCloudinary;
 import com.example.demo.Genre.BaseGenre;
 import com.example.demo.Genre.Genre;
 import com.example.demo.Genre.GenreRepository;
+import com.example.demo.Image;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.File;
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -71,7 +75,20 @@ public class ProductService {
     public Product editProduct(ProductInput editedProductInput, String id) throws ServerException {
         if (productRepository.findById(id).isEmpty()) throw new ServerException("Can't find the id");
 
-        Product product = new Product();
+        List<Image> images = new ArrayList<>();
+        Product product = productRepository.findById(id).get();
+        if (editedProductInput.getImages() != null && !editedProductInput.getImages().isEmpty()) {
+            List<MultipartFile> inputImages = editedProductInput.getImages();
+            inputImages.forEach((image) -> {
+                Map<?, ?> result = productRepository.uploadImageToCloudinary(image, product.getName(), "cover");
+                System.out.println("Custom image: ");
+                System.out.println(result);
+                Image img = new Image((String) result.get("url"), Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[0], "cover");
+                images.add(img);
+            });
+        }
+
+        product.setImages(images);
         product.convertInputToProduct(editedProductInput);
         String genreId = editedProductInput.getGenreId();
         setGenreToProduct(genreId, product);

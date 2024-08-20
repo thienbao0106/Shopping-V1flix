@@ -1,12 +1,14 @@
 package com.example.demo.Product;
 
 import com.example.demo.Genre.BaseGenre;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.demo.Image;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 @Setter
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
 public class Product extends BaseProduct {
 
 
+    private List<Image> images;
+
     @DocumentReference( collection = "genre")
     @JsonIgnoreProperties("products")
     private BaseGenre genre;
@@ -28,7 +32,7 @@ public class Product extends BaseProduct {
 
     public void convertInputToProduct(ProductInput productInput) {
         this.setName(productInput.getName());
-        this.setImages(productInput.getImages());
+//        this.setImages(productInput.getImages());
         this.setCreated(productInput.getCreated());
         this.setName(productInput.getName());
         this.setQuantity(productInput.getQuantity());
