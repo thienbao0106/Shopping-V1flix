@@ -1,22 +1,22 @@
 package com.example.demo.Product;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.example.demo.CustomCloudinary;
 import com.example.demo.Genre.BaseGenre;
 import com.example.demo.Genre.Genre;
 import com.example.demo.Genre.GenreRepository;
 import com.example.demo.Image;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.io.File;
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
 import java.util.*;
+
 
 @AllArgsConstructor
 @Service
@@ -41,25 +41,42 @@ public class ProductService {
 
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    private void uploadImages(ProductInput productInput, Product product) {
+        List<Image> images = new ArrayList<>();
+        if (productInput.getImages() != null && !productInput.getImages().isEmpty()) {
+            List<MultipartFile> inputImages = productInput.getImages();
+            inputImages.forEach((image) -> {
+                Map<?, ?> result = productRepository.uploadImageToCloudinary(image, product.getName(), "cover");
+                System.out.println("Custom image: ");
+                System.out.println(result);
+                Image img = new Image((String) result.get("url"), Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[0], "cover");
+                images.add(img);
+            });
+        }
+        product.setImages(images);
     }
 
-    public List<Product> findProductByName(String name) {
-        return productRepository.findProductByName(name);
+    public Page<Product> getAllProducts(Pageable pageable) {
+
+        return productRepository.findAll(pageable);
     }
 
-    //Fix the create product
+    public Page<Product> findProductByName(String name, Pageable pageable) {
+        return productRepository.findProductByName(name, pageable);
+    }
+
+
     public Product createProduct(ProductInput productInput) throws ServerException {
         if (productInput.getImages() == null) {
             productInput.setImages(List.of());
         }
         Product product = new Product();
         product.convertInputToProduct(productInput);
+        product.setCreated(LocalDateTime.now());
+
         String genreId = productInput.getGenreId();
         setGenreToProduct(genreId, product);
-
-        product.setCreated(LocalDateTime.now());
+        uploadImages(productInput, product);
 
         Product newProduct = productRepository.save(product);
         if (productInput.getGenreId() != null) genreRepository.insertProduct(newProduct.getGenre().getId(), newProduct);
@@ -75,20 +92,9 @@ public class ProductService {
     public Product editProduct(ProductInput editedProductInput, String id) throws ServerException {
         if (productRepository.findById(id).isEmpty()) throw new ServerException("Can't find the id");
 
-        List<Image> images = new ArrayList<>();
         Product product = productRepository.findById(id).get();
-        if (editedProductInput.getImages() != null && !editedProductInput.getImages().isEmpty()) {
-            List<MultipartFile> inputImages = editedProductInput.getImages();
-            inputImages.forEach((image) -> {
-                Map<?, ?> result = productRepository.uploadImageToCloudinary(image, product.getName(), "cover");
-                System.out.println("Custom image: ");
-                System.out.println(result);
-                Image img = new Image((String) result.get("url"), Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[0], "cover");
-                images.add(img);
-            });
-        }
+        uploadImages(editedProductInput, product);
 
-        product.setImages(images);
         product.convertInputToProduct(editedProductInput);
         String genreId = editedProductInput.getGenreId();
         setGenreToProduct(genreId, product);
@@ -97,6 +103,7 @@ public class ProductService {
         if (genreId != null) genreRepository.insertProduct(genreId, resultProduct);
         return resultProduct;
     }
+
 
     public void deleteProduct(String id) throws ServerException {
         Optional<Product> product = productRepository.findById(id);

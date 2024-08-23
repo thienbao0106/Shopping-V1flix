@@ -10,9 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -24,8 +28,11 @@ public class ProductController {
 
     @GetMapping("")
     public ResponseEntity<?> fetchAllProducts(
-            @RequestParam(required = false, name = "name") String name
+            @RequestParam(required = false, name = "name") String name,
+            @RequestParam(required = false, name = "page", defaultValue = "0") int page,
+            @RequestParam(required = false, name = "pageSize", defaultValue = "0") int pageSize
     ) {
+        Pageable pageable = PageRequest.of(page, pageSize);
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.FETCH_SUCCESSFULLY.toString(),
@@ -33,9 +40,12 @@ public class ProductController {
                 null,
                 ResponseType.SUCCESS.toString()
         );
-        if (name != null) responseHeader.setResponseData(productService.findProductByName(name));
+        if (name != null)
+            responseHeader.setResponseData(productService.findProductByName(name, pageable));
         else
-            responseHeader.setResponseData(productService.getAllProducts());
+            responseHeader.setResponseData(productService.getAllProducts(pageable));
+
+
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
     }
 
@@ -53,11 +63,10 @@ public class ProductController {
     }
 
     @PostMapping(value = "/create",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<?> addProduct(@RequestBody @Valid ProductInput productInput) throws ServerException {
+    public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductInput productInput) throws ServerException {
         if (productInput == null) throw new ServerException("Product can't be emptied");
-//        String genreId = productInput.getGenreId();
         Product newProduct = productService.createProduct(productInput);
 
         ResponseHeader responseHeader = new ResponseHeader(

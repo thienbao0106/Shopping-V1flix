@@ -32,7 +32,6 @@ public class Product extends BaseProduct {
 
     public void convertInputToProduct(ProductInput productInput) {
         this.setName(productInput.getName());
-//        this.setImages(productInput.getImages());
         this.setCreated(productInput.getCreated());
         this.setName(productInput.getName());
         this.setQuantity(productInput.getQuantity());
