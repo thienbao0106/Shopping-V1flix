@@ -12,11 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -30,7 +28,7 @@ public class ProductController {
     public ResponseEntity<?> fetchAllProducts(
             @RequestParam(required = false, name = "name") String name,
             @RequestParam(required = false, name = "page", defaultValue = "0") int page,
-            @RequestParam(required = false, name = "pageSize", defaultValue = "0") int pageSize
+            @RequestParam(name = "pageSize") int pageSize
     ) {
         Pageable pageable = PageRequest.of(page, pageSize);
         ResponseHeader responseHeader = new ResponseHeader(
@@ -65,15 +63,15 @@ public class ProductController {
     @PostMapping(value = "/create",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductInput productInput) throws ServerException {
-        if (productInput == null) throw new ServerException("Product can't be emptied");
-        Product newProduct = productService.createProduct(productInput);
+    public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductDTO productDTO) throws ServerException {
+        if (productDTO == null) throw new ServerException("Product can't be emptied");
+        ProductModel newProductModel = productService.createProduct(productDTO);
 
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.CREATE_SUCCESSFULLY.toString(),
-                "Create product" + newProduct.getName() + " successfully",
-                newProduct,
+                "Create product" + newProductModel.getName() + " successfully",
+                newProductModel,
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
@@ -81,13 +79,13 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @ModelAttribute ProductInput productInput) throws ServerException {
-        if (productInput == null) throw new ServerException("Product can't be emptied");
+    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @ModelAttribute ProductDTO productDTO) throws ServerException {
+        if (productDTO == null) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.EDIT_SUCCESSFULLY.toString(),
                 "Edit product with id " + id + " successfully",
-                productService.editProduct(productInput, id),
+                productService.editProduct(productDTO, id),
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.CREATED);

@@ -1,18 +1,16 @@
 package com.example.demo.Product;
 
-import com.example.demo.Genre.BaseGenre;
-import com.example.demo.Genre.Genre;
-import com.example.demo.Genre.GenreRepository;
+import com.example.demo.Category.CategoryModel;
+import com.example.demo.Category.CategoryRepository;
 import com.example.demo.Image;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import java.io.File;
+
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,17 +21,14 @@ import java.util.*;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final GenreRepository genreRepository;
+    private final CategoryRepository categoryRepository;
 
-    private void setGenreToProduct(String genreId, Product product) {
-        if (genreId == null || genreId.isEmpty()) return;
-        Optional<Genre> genre = genreRepository.findById(genreId);
-        genre.ifPresentOrElse((result) -> {
-            BaseGenre baseGenre = result.covertToBaseGenre();
-            product.setGenre(baseGenre);
-        }, () -> {
+    private void setCategoryToProduct(String categoryId, ProductModel productModel) {
+        if (categoryId == null || categoryId.isEmpty()) return;
+        Optional<CategoryModel> category = categoryRepository.findById(categoryId);
+        category.ifPresentOrElse(productModel::setCategory, () -> {
             try {
-                throw new ServerException("Can't find the genre of id: " + genreId);
+                throw new ServerException("Can't find the genre of id: " + categoryId);
             } catch (ServerException ignored) {
 
             }
@@ -41,75 +36,75 @@ public class ProductService {
 
     }
 
-    private void uploadImages(ProductInput productInput, Product product) {
+    private void uploadImages(ProductDTO productDTO, ProductModel productModel) {
         List<Image> images = new ArrayList<>();
-        if (productInput.getImages() != null && !productInput.getImages().isEmpty()) {
-            List<MultipartFile> inputImages = productInput.getImages();
+        if (productDTO.getImages() != null && !productDTO.getImages().isEmpty()) {
+            List<MultipartFile> inputImages = productDTO.getImages();
             inputImages.forEach((image) -> {
-                Map<?, ?> result = productRepository.uploadImageToCloudinary(image, product.getName(), "cover");
+                Map<?, ?> result = productRepository.uploadImageToCloudinary(image, productModel.getName(), "cover");
                 System.out.println("Custom image: ");
                 System.out.println(result);
                 Image img = new Image((String) result.get("url"), Objects.requireNonNull(image.getOriginalFilename()).split("\\.")[0], "cover");
                 images.add(img);
             });
         }
-        product.setImages(images);
+        productModel.setImages(images);
     }
 
-    public Page<Product> getAllProducts(Pageable pageable) {
+    public Page<ProductModel> getAllProducts(Pageable pageable) {
 
         return productRepository.findAll(pageable);
     }
 
-    public Page<Product> findProductByName(String name, Pageable pageable) {
+    public Page<ProductModel> findProductByName(String name, Pageable pageable) {
         return productRepository.findProductByName(name, pageable);
     }
 
 
-    public Product createProduct(ProductInput productInput) throws ServerException {
-        if (productInput.getImages() == null) {
-            productInput.setImages(List.of());
+    public ProductModel createProduct(ProductDTO productDTO) throws ServerException {
+        if (productDTO.getImages() == null) {
+            productDTO.setImages(List.of());
         }
-        Product product = new Product();
-        product.convertInputToProduct(productInput);
-        product.setCreated(LocalDateTime.now());
+        ProductModel productModel = new ProductModel();
+        productModel.convertDTOToProduct(productDTO);
+        productModel.setCreated(LocalDateTime.now());
 
-        String genreId = productInput.getGenreId();
-        setGenreToProduct(genreId, product);
-        uploadImages(productInput, product);
+        String genreId = productDTO.getGenreId();
+        setCategoryToProduct(genreId, productModel);
+        uploadImages(productDTO, productModel);
 
-        Product newProduct = productRepository.save(product);
-        if (productInput.getGenreId() != null) genreRepository.insertProduct(newProduct.getGenre().getId(), newProduct);
-        return newProduct;
+        ProductModel newProductModel = productRepository.save(productModel);
+        if (productDTO.getGenreId() != null) categoryRepository.insertProduct(newProductModel.getCategory().getId(), newProductModel);
+        return newProductModel;
     }
 
-    public Product getProductById(String id) throws ServerException {
-        Optional<Product> product = productRepository.findById(id);
+    public ProductModel getProductById(String id) throws ServerException {
+        Optional<ProductModel> product = productRepository.findById(id);
         return product.map(ResponseEntity::ok)
                 .orElseThrow(() -> new ServerException("Can't find the product of id: " + id)).getBody();
     }
 
-    public Product editProduct(ProductInput editedProductInput, String id) throws ServerException {
+    public ProductModel editProduct(ProductDTO editedProductDTO, String id) throws ServerException {
         if (productRepository.findById(id).isEmpty()) throw new ServerException("Can't find the id");
 
-        Product product = productRepository.findById(id).get();
-        uploadImages(editedProductInput, product);
+        ProductModel productModel = productRepository.findById(id).get();
+        uploadImages(editedProductDTO, productModel);
 
-        product.convertInputToProduct(editedProductInput);
-        String genreId = editedProductInput.getGenreId();
-        setGenreToProduct(genreId, product);
+        productModel.convertDTOToProduct(editedProductDTO);
+        String genreId = editedProductDTO.getGenreId();
+        setCategoryToProduct(genreId, productModel);
 
-        Product resultProduct = productRepository.editCurrentObject(id, productRepository.convertItemToMap(product), Product.class);
-        if (genreId != null) genreRepository.insertProduct(genreId, resultProduct);
-        return resultProduct;
+        ProductModel resultProductModel = productRepository.editCurrentObject(id, productRepository.convertItemToMap(productModel), ProductModel.class);
+        if (genreId != null) categoryRepository.insertProduct(genreId, resultProductModel);
+        return resultProductModel;
     }
 
 
     public void deleteProduct(String id) throws ServerException {
-        Optional<Product> product = productRepository.findById(id);
+        Optional<ProductModel> product = productRepository.findById(id);
         product.ifPresentOrElse((result) -> {
-            BaseGenre genre = result.getGenre();
-            genreRepository.removeProduct(genre.getId(), result);
+            CategoryModel genre = result.getCategory();
+            categoryRepository.removeProduct(genre.getId(), result);
         }, () -> {
             try {
                 throw new ServerException("Can't find the product of id: " + id);

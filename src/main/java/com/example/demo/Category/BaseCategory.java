@@ -1,19 +1,16 @@
-package com.example.demo.Genre;
+package com.example.demo.Category;
 
 import com.example.demo.Image;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
-public class BaseGenre {
-    @Id
-    private String id;
+public class BaseCategory {
+
 
     @Indexed(unique = true)
     @NotBlank

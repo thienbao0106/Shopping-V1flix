@@ -1,4 +1,4 @@
-package com.example.demo.Genre;
+package com.example.demo.Category;
 
 import com.example.demo.Base.ResponseHeader;
 import com.example.demo.Enum.ResponseType;
@@ -15,74 +15,74 @@ import java.rmi.ServerException;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/genres")
+@RequestMapping("/categories")
 @AllArgsConstructor
 @ControllerAdvice
-public class GenreController {
+public class CategoryController {
     @Autowired
-    private GenreService genreService;
+    private CategoryService categoryService;
 
     @GetMapping(value = "")
-    public ResponseEntity<?> fetchGenres() {
+    public ResponseEntity<?> fetchCategories() {
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.FETCH_SUCCESSFULLY.toString(),
-                "Fetch list of genres successfully",
-                genreService.getAllGenres(),
+                "Fetch list of categories successfully",
+                categoryService.getAllGenres(),
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> fetchGenreById(@PathVariable("id") String id) throws ServerException {
+    public ResponseEntity<?> fetchCategoryById(@PathVariable("id") String id) throws ServerException {
         if (id == null || id.isEmpty()) throw new ServerException("Product can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.FETCH_SUCCESSFULLY.toString(),
-                "Find product with id " + id + " successfully",
-                genreService.getGenreById(id),
+                "Find category with id " + id + " successfully",
+                categoryService.getGenreById(id),
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/create",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<?> addProduct(@RequestBody @Valid Genre genre) throws ServerException {
-        if (genre == null) throw new ServerException("Genre can't be emptied");
-        Genre newGenre = genreService.createGenre(genre);
+    public ResponseEntity<?> addCategory(@ModelAttribute @Valid CategoryDTO categoryDTO) throws ServerException {
+        if (categoryDTO == null) throw new ServerException("Genre can't be emptied");
+        CategoryModel newCategoryModel = categoryService.createCategory(categoryDTO);
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.CREATE_SUCCESSFULLY.toString(),
-                "Create genre " + genre.getName() + " successfully",
-                newGenre,
+                "Create category " + categoryDTO.getName() + " successfully",
+                newCategoryModel,
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @RequestBody BaseGenre baseGenre) throws ServerException {
-        if (baseGenre == null) throw new ServerException("Genre can't be emptied");
+    public ResponseEntity<?> editCategory(@PathVariable(value = "id") String id, @RequestBody CategoryDTO categoryDTO) throws ServerException {
+        if (categoryDTO == null) throw new ServerException("Genre can't be emptied");
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.EDIT_SUCCESSFULLY.toString(),
-                "Edit product with id " + id + " successfully",
-                genreService.editGenre(baseGenre, id),
+                "Edit category with id " + id + " successfully",
+                categoryService.editCategory(categoryDTO, id),
                 ResponseType.SUCCESS.toString()
         );
         return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{id}/delete")
-    public ResponseEntity<?> removeGenre(@PathVariable(value = "id") String id) throws ServerException {
-        genreService.deleteGenre(id);
+    public ResponseEntity<?> removeCategory(@PathVariable(value = "id") String id) throws ServerException {
+        categoryService.deleteCategory(id);
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.DELETE_SUCCESSFULLY.toString(),
-                "Delete genre with id " + id + " successfully",
+                "Delete category with id " + id + " successfully",
                 null,
                 ResponseType.SUCCESS.toString()
         );

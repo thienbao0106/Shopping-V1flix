@@ -15,8 +15,7 @@ import java.util.List;
 @Setter
 @Getter
 public class BaseProduct {
-    @Id
-    private String id;
+
 
     @Indexed(unique = true)
     @NotBlank
