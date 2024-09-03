@@ -22,7 +22,7 @@ public class BaseProduct {
     private String name;
 
     @Min(value = 0, message = "Price can't lower than 0")
-    private Double price;
+    private Integer price;
 
     private String description;
 

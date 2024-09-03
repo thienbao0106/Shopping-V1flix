@@ -26,6 +26,7 @@ public class QueryRepositoryImpl<T> implements QueryRepository<T> {
                 update.set(key, value);
             }
         });
+
         return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), type);
     }
 }

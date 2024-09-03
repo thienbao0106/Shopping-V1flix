@@ -22,22 +22,32 @@ public class UtilsRepositoryImpl<T> implements UtilsRepository<T> {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, T> convertItemToMap(T product) {
-        Map<String, T> itemMap = new HashMap<>();
-        if (product != null) {
-            // Use reflection to get all fields
-            Field[] fields = product.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true); // Allows access to private fields
-                try {
-                    Object value = field.get(product);
-                    itemMap.put(field.getName(), (T) value);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace(); // Handle exception properly
+    public Map<String, T> convertItemToMap(T item, String className)  {
+        try {
+            Map<String, T> itemMap = new HashMap<>();
+            Class<?> itemClass = Class.forName(className);
+            while(itemClass != null) {
+                if (item != null) {
+                    // Use reflection to get all fields
+                    Field[] fields = itemClass.getDeclaredFields();
+                    for (Field field : fields) {
+                        field.setAccessible(true); // Allows access to private fields
+                        try {
+                            Object value = field.get(item);
+                            itemMap.put(field.getName(), (T) value);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace(); // Handle exception properly
+                        }
+                    }
                 }
+                itemClass = itemClass.getSuperclass();
             }
+
+            return itemMap;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return itemMap;
+
     }
 
     private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {

@@ -12,7 +12,7 @@ import java.util.List;
 public class ProductDTO extends BaseProduct implements Serializable {
     private List<MultipartFile> images;
 
-    private String genreId;
+    private String categoryId;
 
     public ProductDTO() {
 

@@ -4,6 +4,7 @@ import com.example.demo.Category.CategoryModel;
 import com.example.demo.Category.CategoryRepository;
 import com.example.demo.Image;
 import lombok.AllArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,12 +70,13 @@ public class ProductService {
         productModel.convertDTOToProduct(productDTO);
         productModel.setCreated(LocalDateTime.now());
 
-        String genreId = productDTO.getGenreId();
-        setCategoryToProduct(genreId, productModel);
+        String categoryId = productDTO.getCategoryId();
+        setCategoryToProduct(categoryId, productModel);
         uploadImages(productDTO, productModel);
 
-        ProductModel newProductModel = productRepository.save(productModel);
-        if (productDTO.getGenreId() != null) categoryRepository.insertProduct(newProductModel.getCategory().getId(), newProductModel);
+        ProductModel newProductModel = productRepository.insert(productModel);
+        if (productDTO.getCategoryId() != null)
+            categoryRepository.insertProduct(newProductModel.getCategory().getId(), new ObjectId(newProductModel.getId()));
         return newProductModel;
     }
 
@@ -91,11 +93,14 @@ public class ProductService {
         uploadImages(editedProductDTO, productModel);
 
         productModel.convertDTOToProduct(editedProductDTO);
-        String genreId = editedProductDTO.getGenreId();
-        setCategoryToProduct(genreId, productModel);
 
-        ProductModel resultProductModel = productRepository.editCurrentObject(id, productRepository.convertItemToMap(productModel), ProductModel.class);
-        if (genreId != null) categoryRepository.insertProduct(genreId, resultProductModel);
+        String categoryId = editedProductDTO.getCategoryId();
+        setCategoryToProduct(categoryId, productModel);
+        System.out.println("Price: " + productModel.getPrice());
+        Class<ProductModel> productModelClass = ProductModel.class;
+        ProductModel resultProductModel = productRepository.editCurrentObject(id, productRepository.convertItemToMap(productModel, productModelClass.getName()), productModelClass);
+
+        if (categoryId != null) categoryRepository.insertProduct(categoryId, new ObjectId(resultProductModel.getId()));
         return resultProductModel;
     }
 
@@ -103,8 +108,8 @@ public class ProductService {
     public void deleteProduct(String id) throws ServerException {
         Optional<ProductModel> product = productRepository.findById(id);
         product.ifPresentOrElse((result) -> {
-            CategoryModel genre = result.getCategory();
-            categoryRepository.removeProduct(genre.getId(), result);
+            CategoryModel category = result.getCategory();
+            categoryRepository.removeProduct(category.getId(), result);
         }, () -> {
             try {
                 throw new ServerException("Can't find the product of id: " + id);

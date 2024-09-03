@@ -37,16 +37,17 @@ public class CategoryService {
     public CategoryModel editCategory(BaseCategory editedGenre, String genreId) throws ServerException {
         if (categoryRepository.findById(genreId).isEmpty())
             throw new ServerException("Can't find the id of genre: " + genreId);
-        return categoryRepository.editCurrentObject(genreId, categoryRepository.convertItemToMap((CategoryModel) editedGenre), CategoryModel.class);
+        Class<CategoryModel> categoryModelClass = CategoryModel.class;
+        return categoryRepository.editCurrentObject(genreId, categoryRepository.convertItemToMap((CategoryModel) editedGenre, categoryModelClass.getName()), categoryModelClass);
     }
 
     public void deleteCategory(String genreId) throws ServerException {
         CategoryModel categoryModel = categoryRepository.findById(genreId).map(ResponseEntity::ok).orElseThrow(() -> new ServerException("Can't find the genre of id: " + genreId)).getBody();
         assert categoryModel != null;
         List<ProductModel> products = categoryModel.getProducts();
-        if(products != null) {
+        if (products != null) {
             products.forEach((product) -> {
-                productRepository.removeGenreInProduct(product.getId());
+                productRepository.removeGenreInProduct(String.valueOf(product));
             });
         }
         categoryRepository.deleteById(genreId);

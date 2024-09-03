@@ -4,9 +4,12 @@ import com.example.demo.Category.CategoryModel;
 import com.example.demo.Image;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -37,6 +40,9 @@ public class ProductModel extends BaseProduct {
         this.setCreated(productDTO.getCreated());
         this.setQuantity(productDTO.getQuantity());
         this.setDescription(productDTO.getDescription());
+        this.setPrice(productDTO.getPrice());
+
+
     }
 
 }
