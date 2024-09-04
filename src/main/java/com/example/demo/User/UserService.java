@@ -1,5 +1,4 @@
 package com.example.demo.User;
-
 import lombok.AllArgsConstructor;
 
 
@@ -25,4 +24,5 @@ public class UserService {
         newUserModel.convertDTOToUser(userDTO);
         return userRepository.save(newUserModel);
     }
+
 }

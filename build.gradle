@@ -28,6 +28,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.cloudinary:cloudinary-http44:1.33.0'
+	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'org.springframework.security:spring-security-web:6.3.0'
+
+	implementation 'org.springframework.security:spring-security-config:6.3.3'
 	implementation 'org.springframework.security:spring-security-crypto'// or another appropriate version
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly 'org.springframework.boot:spring-boot-starter-validation'
