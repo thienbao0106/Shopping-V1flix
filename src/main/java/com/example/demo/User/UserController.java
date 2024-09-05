@@ -22,6 +22,7 @@ public class UserController {
     private UserService userService;
     @GetMapping("")
     public ResponseEntity<?> fetchAllProducts() {
+
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.FETCH_SUCCESSFULLY.toString(),
