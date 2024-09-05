@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.rmi.ServerException;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @AllArgsConstructor
 @Controller
@@ -21,17 +22,20 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@Param("username") String username, String password) throws ServerException {
+    public ResponseEntity<?> authenticate(@Param("username") String username, @Param("password")String password) throws ServerException {
         // Validate user credentials
         // If valid, generate JWT token
+        LoginResponseModel responseModel = authService.authenticate(username, password);
         ResponseHeader responseHeader = new ResponseHeader(
                 LocalDateTime.now(),
                 SuccessType.FETCH_SUCCESSFULLY.toString(),
                 "Login successfully",
-                authService.authenticate(username, password),
+                responseModel
+                ,
                 ResponseType.SUCCESS.toString()
         );
-
-        return new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
+        final ResponseEntity<Map<String, Object>> responseEntity = new ResponseEntity<>(responseHeader.convertToMap(), HttpStatus.OK);
+        ResponseEntity.ok().header("Authorization", "Bearer " + responseModel.getToken());
+        return responseEntity;
     }
 }

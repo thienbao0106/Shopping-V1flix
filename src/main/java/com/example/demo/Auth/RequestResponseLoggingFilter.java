@@ -1,7 +1,10 @@
 package com.example.demo.Auth;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.example.demo.Base.ResponseHeader;
 import com.example.demo.Enum.ResponseType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.FilterChain;
@@ -12,15 +15,26 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.Filter;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.Arrays;
 
 
 public class RequestResponseLoggingFilter implements Filter {
 
+
+    public void writeResponse(ResponseHeader responseHeader, HttpServletResponse response) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String json = objectMapper.writeValueAsString(responseHeader.convertToMap());
+        System.out.println(json);
+        response.getWriter().write(json);
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -39,34 +53,46 @@ public class RequestResponseLoggingFilter implements Filter {
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(request, response);
-        } else {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                response.setStatus(403);
-                response.setContentType("application/json");
-
-                // Create a JSON response object
-                ResponseHeader responseHeader = new ResponseHeader(
-                        LocalDateTime.now(),
-                        "PERMISSION_ERROR",
-                        "This route requires permission",
-                        null,
-                        ResponseType.ERROR.toString()
-                );
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                String json = objectMapper.writeValueAsString(responseHeader.convertToMap());
-                System.out.println(json);
-                response.getWriter().write(json);
-                return;
-//                throw new AccessDeniedException("This route need authorization");
-            }
+            return;
         }
-        final String token = authHeader.substring(7);
-        System.out.println("Token: " + token);
-        request.setAttribute("token", token);
-        filterChain.doFilter(request, response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setStatus(403);
+            response.setContentType("application/json");
+
+            // Create a JSON response object
+            ResponseHeader responseHeader = new ResponseHeader(
+                    LocalDateTime.now(),
+                    "PERMISSION_ERROR",
+                    "This route requires permission",
+                    null,
+                    ResponseType.ERROR.toString()
+            );
+
+            writeResponse(responseHeader, response);
+            return;
+        }
+
+        final String jwtToken = authHeader.substring(7);
+        try {
+            String result = JWT.decode(jwtToken).getClaim("userId").asString();
+            if(result == null) throw new JWTDecodeException("Token is error");
+            GrantedAuthority authority = new SimpleGrantedAuthority("user");
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(result, jwtToken, Arrays.asList(authority));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            filterChain.doFilter(request, response);
+        } catch (JWTDecodeException jwtDecodeException) {
+            response.setStatus(403);
+            response.setContentType("application/json");
+            // Create a JSON response object
+            ResponseHeader responseHeader = new ResponseHeader(
+                    LocalDateTime.now(),
+                    "PERMISSION_ERROR",
+                    jwtDecodeException.getMessage(),
+                    null,
+                    ResponseType.ERROR.toString()
+            );
+            writeResponse(responseHeader, response);
+        }
+
     }
-
-
 }

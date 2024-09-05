@@ -31,6 +31,6 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         System.out.println("Check custom route");
-        return web -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/products"));
+        return web -> web.ignoring().requestMatchers("/products", "/auth/login");
     }
 }
