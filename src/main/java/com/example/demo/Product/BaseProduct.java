@@ -1,6 +1,7 @@
 package com.example.demo.Product;
 
 import com.example.demo.Image;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
@@ -20,6 +21,7 @@ public class BaseProduct {
     @Indexed(unique = true)
     @NotBlank
     private String name;
+
 
     @Min(value = 0, message = "Price can't lower than 0")
     private Integer price;

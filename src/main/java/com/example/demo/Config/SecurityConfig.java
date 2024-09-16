@@ -9,14 +9,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.preauth.RequestAttributeAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         System.out.println("Checked security");
@@ -31,6 +28,9 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         System.out.println("Check custom route");
-        return web -> web.ignoring().requestMatchers("/products", "/auth/login");
+        return web -> web.ignoring().requestMatchers("/products/**",
+                "/auth/login",
+                "/swagger/**", "/swagger-ui-custom.html",
+                "/swagger-ui/**");
     }
 }
