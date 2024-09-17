@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class ProductController {
     }
 
 
-    @Operation(summary = "Create a product", description = "Create a product")
+    @Operation(summary = "Create a product", description = "Create a product", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created", content = @Content(examples = {
                     @ExampleObject(name = "createProduct", value = ExampleResponse.createProduct)
@@ -110,7 +111,7 @@ public class ProductController {
     }
 
 
-    @Operation(summary = "Edit a product", description = "Edit a product")
+    @Operation(summary = "Edit a product", description = "Edit a product",  security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully edited", content = @Content(examples = {
                     @ExampleObject(name = "createProduct", value = ExampleResponse.editProduct)
@@ -131,7 +132,7 @@ public class ProductController {
 
     }
 
-    @Operation(summary = "Delete a product", description = "Delete a product by id")
+    @Operation(summary = "Delete a product", description = "Delete a product by id",  security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully edited", content = @Content(examples = {
                     @ExampleObject(name = "createProduct", value = ExampleResponse.deleteProduct)

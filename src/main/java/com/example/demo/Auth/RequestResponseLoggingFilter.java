@@ -2,6 +2,7 @@ package com.example.demo.Auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.demo.Base.ResponseHeader;
 import com.example.demo.Enum.ResponseType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 
 
 public class RequestResponseLoggingFilter implements Filter {
@@ -73,9 +75,13 @@ public class RequestResponseLoggingFilter implements Filter {
         }
 
         final String jwtToken = authHeader.substring(7);
+
         try {
-            String result = JWT.decode(jwtToken).getClaim("userId").asString();
-            if(result == null) throw new JWTDecodeException("Token is error");
+            DecodedJWT decodedJWT = JWT.decode(jwtToken);
+            if (decodedJWT.getExpiresAt().before(new Date())) throw new JWTDecodeException("Token is expired");
+            String result = decodedJWT.getClaim("userId").asString();
+            if (result == null) throw new JWTDecodeException("Token is error");
+
             GrantedAuthority authority = new SimpleGrantedAuthority("user");
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(result, jwtToken, Arrays.asList(authority));
             SecurityContextHolder.getContext().setAuthentication(auth);
