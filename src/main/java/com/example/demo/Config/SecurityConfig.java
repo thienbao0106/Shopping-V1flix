@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
 
-
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         System.out.println("Checked security");
@@ -35,7 +34,8 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         System.out.println("Check custom route");
-        return web -> web.ignoring().requestMatchers("/products",
+        return web -> web.ignoring().requestMatchers("/products/**", "/categories/**",
+                "/users/create",
                 "/auth/login",
                 "/swagger/**", "/swagger-ui-custom.html",
                 "/swagger-ui/**");

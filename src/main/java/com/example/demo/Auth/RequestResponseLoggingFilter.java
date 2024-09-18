@@ -78,7 +78,9 @@ public class RequestResponseLoggingFilter implements Filter {
 
         try {
             DecodedJWT decodedJWT = JWT.decode(jwtToken);
-            if (decodedJWT.getExpiresAt().before(new Date())) throw new JWTDecodeException("Token is expired");
+
+
+            if (!decodedJWT.getExpiresAt().before(new Date())) throw new JWTDecodeException("Token is expired");
             String result = decodedJWT.getClaim("userId").asString();
             if (result == null) throw new JWTDecodeException("Token is error");
 

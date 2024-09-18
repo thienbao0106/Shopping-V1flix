@@ -13,7 +13,9 @@ public class FilterConfig {
         filter.setFilter(new RequestResponseLoggingFilter());
         // provide endpoints which needs to be restricted.
         // All Endpoints would be restricted if unspecified
-        filter.addUrlPatterns("/users", "/products/*");
+        filter.addUrlPatterns("/users",
+                            "/products/create", "/products/**/edit", "/products/**/delete",
+                            "/categories/create", "/categories/**/edit", "/categories/**/delete");
         return filter;
     }
 }

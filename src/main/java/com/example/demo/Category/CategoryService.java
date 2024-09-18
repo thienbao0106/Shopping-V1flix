@@ -34,11 +34,13 @@ public class CategoryService {
         return categoryRepository.save(newCategory);
     }
 
-    public CategoryModel editCategory(BaseCategory editedGenre, String genreId) throws ServerException {
-        if (categoryRepository.findById(genreId).isEmpty())
-            throw new ServerException("Can't find the id of genre: " + genreId);
+    public CategoryModel editCategory(CategoryDTO editedCategory, String categoryId) throws ServerException {
+        if (categoryRepository.findById(categoryId).isEmpty())
+            throw new ServerException("Can't find the id of genre: " + categoryId);
+        CategoryModel categoryModel = categoryRepository.findById(categoryId).get();
+        categoryModel.convertDTOToCategory(editedCategory);
         Class<CategoryModel> categoryModelClass = CategoryModel.class;
-        return categoryRepository.editCurrentObject(genreId, categoryRepository.convertItemToMap((CategoryModel) editedGenre, categoryModelClass.getName()), categoryModelClass);
+        return categoryRepository.editCurrentObject(categoryId, categoryRepository.convertItemToMap(categoryModel, categoryModelClass.getName()), categoryModelClass);
     }
 
     public void deleteCategory(String genreId) throws ServerException {
