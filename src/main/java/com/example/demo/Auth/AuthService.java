@@ -27,7 +27,7 @@ public class AuthService {
         boolean isPassword = BCrypt.checkpw(password, userModel.getPassword());
         if(!isPassword) throw new ServerException("Can't find this password");
 
-        Date expiredAt = new Date(System.currentTimeMillis() + 5000L);
+        Date expiredAt = new Date(System.currentTimeMillis() + 1000L);
 
         Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
         String jwtToken = JWT.create()

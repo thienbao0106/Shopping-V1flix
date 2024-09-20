@@ -3,6 +3,7 @@ package com.example.demo.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class BaseUser {
 
     @Indexed(unique = true)
     @NotBlank
+    @Email
     private String email;
 
     private String address;

@@ -41,7 +41,7 @@ public class ProductController {
     })
     @GetMapping("")
     public ResponseEntity<?> fetchAllProducts(
-            @RequestParam(required = false, name = "name") @Parameter(name = "name", description = "Number of Page", example = "Yuru Camp") String name,
+            @RequestParam(required = false, name = "name") @Parameter(name = "name", description = "Name needed to search", example = "Yuru Camp") String name,
             @RequestParam(required = false, name = "page", defaultValue = "0") @Parameter(name = "page", description = "Number of Page", example = "1") int page,
             @RequestParam(name = "pageSize") @Parameter(name = "pageSize", description = "Size of the page", example = "1") int pageSize
     ) {
