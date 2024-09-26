@@ -37,6 +37,7 @@ public class SecurityConfig {
         return web -> web.ignoring().requestMatchers("/products/**", "/categories/**",
                 "/users/create",
                 "/auth/login",
+                "/sales/**",
                 "/swagger/**", "/swagger-ui-custom.html",
                 "/swagger-ui/**");
     }

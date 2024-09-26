@@ -3,6 +3,8 @@ package com.example.demo.Product;
 import com.example.demo.Category.CategoryModel;
 import com.example.demo.Category.CategoryRepository;
 import com.example.demo.Image;
+import com.example.demo.Sale.SaleModel;
+import com.example.demo.Sale.SaleRepository;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SaleRepository saleRepository;
 
     private void setCategoryToProduct(String categoryId, ProductModel productModel) {
         if (categoryId == null || categoryId.isEmpty()) return;
@@ -34,7 +37,18 @@ public class ProductService {
 
             }
         });
+    }
 
+    private void setSaleToProduct(String saleId, ProductModel productModel) {
+        if (saleId == null || saleId.isEmpty()) return;
+        Optional<SaleModel> sale = saleRepository.findById(saleId);
+        sale.ifPresentOrElse(productModel::setSale, () -> {
+            try {
+                throw new ServerException("Can't find the genre of id: " + saleId);
+            } catch (ServerException ignored) {
+
+            }
+        });
     }
 
     private void uploadImages(ProductDTO productDTO, ProductModel productModel) {
@@ -71,12 +85,16 @@ public class ProductService {
         productModel.setCreated(LocalDateTime.now());
 
         String categoryId = productDTO.getCategoryId();
+        String saleId = productDTO.getSaleId();
         setCategoryToProduct(categoryId, productModel);
+        setSaleToProduct(saleId, productModel);
         uploadImages(productDTO, productModel);
 
         ProductModel newProductModel = productRepository.insert(productModel);
-        if (productDTO.getCategoryId() != null)
+        if (categoryId != null)
             categoryRepository.insertProduct(newProductModel.getCategory().getId(), new ObjectId(newProductModel.getId()));
+        if(saleId != null)
+            saleRepository.insertProduct(newProductModel.getSale().getId(), new ObjectId(newProductModel.getId()));
         return newProductModel;
     }
 
@@ -95,12 +113,15 @@ public class ProductService {
         productModel.convertDTOToProduct(editedProductDTO);
 
         String categoryId = editedProductDTO.getCategoryId();
+        String saleId = editedProductDTO.getSaleId();
+        System.out.println("Sale id: " + saleId);
         setCategoryToProduct(categoryId, productModel);
-        System.out.println("Price: " + productModel.getPrice());
+        setSaleToProduct(saleId, productModel);
         Class<ProductModel> productModelClass = ProductModel.class;
         ProductModel resultProductModel = productRepository.editCurrentObject(id, productRepository.convertItemToMap(productModel, productModelClass.getName()), productModelClass);
 
         if (categoryId != null) categoryRepository.insertProduct(categoryId, new ObjectId(resultProductModel.getId()));
+        if (saleId != null) saleRepository.insertProduct(saleId, new ObjectId(resultProductModel.getId()));
         return resultProductModel;
     }
 

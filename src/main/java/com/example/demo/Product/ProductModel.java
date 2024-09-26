@@ -2,6 +2,7 @@ package com.example.demo.Product;
 
 import com.example.demo.Category.CategoryModel;
 import com.example.demo.Image;
+import com.example.demo.Sale.SaleModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -30,6 +31,10 @@ public class ProductModel extends BaseProduct {
     @DocumentReference(collection = "categories")
     @JsonIgnoreProperties("products")
     private CategoryModel category;
+
+    @DocumentReference(collection = "sales")
+    @JsonIgnoreProperties("products")
+    private SaleModel sale;
 
     public ProductModel() {
         super();

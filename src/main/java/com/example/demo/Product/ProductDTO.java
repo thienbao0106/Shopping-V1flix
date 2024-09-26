@@ -14,6 +14,8 @@ public class ProductDTO extends BaseProduct implements Serializable {
 
     private String categoryId;
 
+    private String saleId;
+
     public ProductDTO() {
 
     }
