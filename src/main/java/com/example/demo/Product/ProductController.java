@@ -116,7 +116,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Successfully edited", content = @Content(examples = {
                     @ExampleObject(name = "createProduct", value = ExampleResponse.editProduct)
             })),
-            @ApiResponse(responseCode = "400", description = "Can't create the product")
+            @ApiResponse(responseCode = "400", description = "Can't edit the product")
     })
     @PutMapping(value = "/{id}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> editProduct(@PathVariable(value = "id") String id, @ModelAttribute ProductDTO productDTO) throws ServerException {

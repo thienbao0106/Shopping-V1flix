@@ -34,10 +34,10 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         System.out.println("Check custom route");
-        return web -> web.ignoring().requestMatchers("/products/**", "/categories/**",
+        return web -> web.ignoring().requestMatchers("/products", "/products/{productId}", "/categories", "/categories/${categoryId}",
                 "/users/create",
                 "/auth/login",
-                "/sales/**",
+                "/sales", "/sales/{saleId}",
                 "/swagger/**", "/swagger-ui-custom.html",
                 "/swagger-ui/**");
     }

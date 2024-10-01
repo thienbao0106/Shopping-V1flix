@@ -38,17 +38,20 @@ public class SaleModel extends BaseSale {
         super();
     }
 
-    public void convertDTOToSale(SaleDTO saleDTO) {
-        System.out.println("Sale hours: " + saleDTO.getHours().toString());
+    private Calendar convertToCalendar(int hours) {
+        System.out.println("Sale hours: " + hours);
         Calendar cal = Calendar.getInstance();
         Date currentDate = new Date();
         cal.setTime(currentDate);
-        cal.add(Calendar.HOUR_OF_DAY, saleDTO.getHours());
+        cal.add(Calendar.HOUR_OF_DAY, hours);
+        return cal;
+    }
+
+    public void convertDTOToSale(SaleDTO saleDTO) {
+        Calendar dueDate = convertToCalendar(saleDTO.getHours());
         this.setName(saleDTO.getName());
         this.setDescription(saleDTO.getDescription());
-        this.setDueDate(cal.getTime());
-//        this.setProducts(List.of());
-//        this.setImages(List.of());
+        this.setDueDate(dueDate.getTime());
         this.setPercentage(saleDTO.getPercentage());
     }
 
