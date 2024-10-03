@@ -1,10 +1,9 @@
 package com.example.demo.Category;
 
-import com.example.demo.Image;
+import com.example.demo.Image.Image;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 @Setter

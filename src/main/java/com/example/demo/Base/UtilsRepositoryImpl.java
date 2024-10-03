@@ -6,10 +6,7 @@ import com.cloudinary.utils.*;
 import com.example.demo.CustomCloudinary;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,11 +19,11 @@ public class UtilsRepositoryImpl<T> implements UtilsRepository<T> {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, T> convertItemToMap(T item, String className)  {
+    public Map<String, T> convertItemToMap(T item, String className) {
         try {
             Map<String, T> itemMap = new HashMap<>();
             Class<?> itemClass = Class.forName(className);
-            while(itemClass != null) {
+            while (itemClass != null) {
                 if (item != null) {
                     // Use reflection to get all fields
                     Field[] fields = itemClass.getDeclaredFields();
@@ -53,20 +50,14 @@ public class UtilsRepositoryImpl<T> implements UtilsRepository<T> {
     private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
         // Create a temporary file
         File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-
-        // Transfer content from MultipartFile to the file
-        multipartFile.transferTo(file);
-
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(multipartFile.getBytes());
+        fos.close();
         return file;
     }
 
-    private String getFileExtension(MultipartFile multipartFile) {
-        // Extract file extension from MultipartFile original filename
-        String originalFilename = multipartFile.getOriginalFilename();
-        return originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".") + 1) : "";
-    }
 
-    public Map<?, ?> uploadImageToCloudinary(MultipartFile imageFile, String productName, String imageType) {
+    public Map<?, ?> uploadImageToCloudinary(MultipartFile imageFile, String itemName, String imageType) {
         CustomCloudinary customCloudinary = new CustomCloudinary();
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", CustomCloudinary.cloudName,
@@ -74,12 +65,14 @@ public class UtilsRepositoryImpl<T> implements UtilsRepository<T> {
                 "api_key", CustomCloudinary.apiKey,
                 "api_secret", CustomCloudinary.apiSecret,
                 "secure", customCloudinary));
-        System.out.println(CustomCloudinary.imageUpload);
         Map<?, ?> obj = null;
         try {
             File image = convertMultipartFileToFile(imageFile);
+            System.out.println(image.isFile());
+            System.out.println("shopping/" + itemName + "/" + itemName + "_" + imageType);
             obj = cloudinary.uploader().upload(image, ObjectUtils.asMap("resource_type", "image",
-                    "public_id", "shopping/" + productName + "/" + productName + "_" + imageType));
+                    "public_id", "shopping/" + itemName + "/" + itemName + "_" + imageType));
+            Files.delete(Path.of(image.getPath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

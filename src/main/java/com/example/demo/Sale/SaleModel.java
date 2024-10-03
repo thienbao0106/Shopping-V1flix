@@ -1,7 +1,6 @@
 package com.example.demo.Sale;
 
-import com.example.demo.Image;
-import com.example.demo.Product.ProductDTO;
+import com.example.demo.Image.Image;
 import com.example.demo.Product.ProductModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

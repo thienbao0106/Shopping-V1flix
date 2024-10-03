@@ -3,7 +3,6 @@ package com.example.demo.Sale;
 import com.example.demo.Base.ResponseHeader;
 import com.example.demo.Enum.ResponseType;
 import com.example.demo.Enum.SuccessType;
-import com.example.demo.Product.ProductDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +24,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/sales")
 @AllArgsConstructor
+
 @ControllerAdvice
 public class SaleController {
     @Autowired

@@ -32,8 +32,7 @@ public class UserService {
         UserModel userModel = userRepository.findById(id).get();
         userModel.convertDTOToUser(edittedUserDTO);
         Class<UserModel> userModelClass = UserModel.class;
-        UserModel resultUserModel = userRepository.editCurrentObject(id, userRepository.convertItemToMap(userModel, userModelClass.getName()), userModelClass);
-        return resultUserModel;
+        return userRepository.editCurrentObject(id, userRepository.convertItemToMap(userModel, userModelClass.getName()), userModelClass);
     }
 
     public void deleteUser(String id) throws ServerException {

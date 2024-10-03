@@ -1,16 +1,13 @@
 package com.example.demo.Product;
 
 import com.example.demo.Category.CategoryModel;
-import com.example.demo.Image;
+import com.example.demo.Image.Image;
 import com.example.demo.Sale.SaleModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

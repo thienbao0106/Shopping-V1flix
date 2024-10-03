@@ -2,7 +2,7 @@ package com.example.demo.Product;
 
 import com.example.demo.Category.CategoryModel;
 import com.example.demo.Category.CategoryRepository;
-import com.example.demo.Image;
+import com.example.demo.Image.Image;
 import com.example.demo.Sale.SaleModel;
 import com.example.demo.Sale.SaleRepository;
 import lombok.AllArgsConstructor;
